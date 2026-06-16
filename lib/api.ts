@@ -2,8 +2,8 @@
 // lib/api.ts — All API calls + WebSocket logic
 // =====================================================================
 
-const API_BASE = "http://localhost:8000";
-const WS_BASE  = "ws://localhost:8000";
+const API_BASE = "https://agent-platform-production-a13b.up.railway.app";
+const WS_BASE  = "wss://agent-platform-production-a13b.up.railway.app";
 
 // ── Auth ──────────────────────────────────────────────────────────────
 
