@@ -2,8 +2,8 @@
 // lib/api.ts — All API calls + WebSocket logic
 // =====================================================================
 
-const API_BASE = "https://agent-platform-production-a13b.up.railway.app";
-const WS_BASE  = "wss://agent-platform-production-a13b.up.railway.app";
+const API_BASE = "http://localhost:8000";
+const WS_BASE  = "ws://localhost:8000";
 
 // ── Auth ──────────────────────────────────────────────────────────────
 
@@ -76,7 +76,11 @@ export function createAgentSocket(
   onOpen?: () => void,
   onClose?: () => void
 ): WebSocket {
-  const ws = new WebSocket(`${WS_BASE}/ws/task?token=${token}`);
+  const wsUrl = `${WS_BASE}/ws/task?token=${encodeURIComponent(token)}`;
+  console.log("🔍 Connecting to WebSocket URL:", wsUrl);
+  console.log("🔍 Token length:", token.length, "Token preview:", token.slice(0, 20) + "...");
+
+  const ws = new WebSocket(wsUrl);
 
   ws.onopen = () => {
     console.log("🔌 WebSocket connected");
@@ -92,8 +96,8 @@ export function createAgentSocket(
     }
   };
 
-  ws.onclose = () => {
-    console.log("🔌 WebSocket closed");
+  ws.onclose = (e) => {
+    console.log("🔌 WebSocket closed. Code:", e.code, "Reason:", e.reason, "Clean:", e.wasClean);
     onClose?.();
   };
 
