@@ -2,8 +2,8 @@
 // lib/api.ts — All API calls + WebSocket logic
 // =====================================================================
 
-const API_BASE = "http://localhost:8000";
-const WS_BASE  = "ws://localhost:8000";
+const API_BASE = "https://agent-platform-production-a13b.up.railway.app";
+const WS_BASE  = "wss://agent-platform-production-a13b.up.railway.app";
 
 // ── Auth ──────────────────────────────────────────────────────────────
 
@@ -14,7 +14,7 @@ export async function register(email: string, password: string) {
     body: JSON.stringify({ email, password }),
   });
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({ detail: "Registration failed" }));
     throw new Error(err.detail || "Registration failed");
   }
   return res.json();
@@ -27,16 +27,16 @@ export async function login(email: string, password: string) {
     body: JSON.stringify({ email, password }),
   });
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({ detail: "Login failed" }));
     throw new Error(err.detail || "Login failed");
   }
-  return res.json(); // { access_token, user_id, email }
+  return res.json();
 }
 
 // ── Task history ──────────────────────────────────────────────────────
 
 export async function getHistory(token: string) {
-  const res = await fetch(`${API_BASE}/history?token=${token}`);
+  const res = await fetch(`${API_BASE}/history?token=${encodeURIComponent(token)}`);
   if (!res.ok) throw new Error("Failed to fetch history");
   return res.json();
 }
@@ -55,7 +55,7 @@ export async function approveTask(
     body: JSON.stringify({ approved, feedback, token }),
   });
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({ detail: "Approval failed" }));
     throw new Error(err.detail || "Approval failed");
   }
   return res.json();
@@ -77,13 +77,12 @@ export function createAgentSocket(
   onClose?: () => void
 ): WebSocket {
   const wsUrl = `${WS_BASE}/ws/task?token=${encodeURIComponent(token)}`;
-  console.log("🔍 Connecting to WebSocket URL:", wsUrl);
-  console.log("🔍 Token length:", token.length, "Token preview:", token.slice(0, 20) + "...");
+  console.log("🔍 Connecting to:", wsUrl);
 
   const ws = new WebSocket(wsUrl);
 
   ws.onopen = () => {
-    console.log("🔌 WebSocket connected");
+    console.log("✅ WebSocket connected");
     onOpen?.();
   };
 
@@ -97,12 +96,12 @@ export function createAgentSocket(
   };
 
   ws.onclose = (e) => {
-    console.log("🔌 WebSocket closed. Code:", e.code, "Reason:", e.reason, "Clean:", e.wasClean);
+    console.log(`🔌 WebSocket closed | code=${e.code} reason="${e.reason}"`);
     onClose?.();
   };
 
   ws.onerror = (e) => {
-    console.error("WebSocket error", e);
+    console.error("❌ WebSocket error", e);
   };
 
   return ws;
