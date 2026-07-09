@@ -24,14 +24,13 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     setSuccess("");
-
     try {
       if (mode === "register") {
         await register(email, password);
-        setSuccess("Account created. Logging you in...");
+        setSuccess("Case file created. Signing you in...");
         const data = await login(email, password);
         Auth.save(data.access_token, data.email, data.user_id);
-        setTimeout(() => router.push("/dashboard"), 800);
+        setTimeout(() => router.push("/dashboard"), 700);
       } else {
         const data = await login(email, password);
         Auth.save(data.access_token, data.email, data.user_id);
@@ -47,214 +46,142 @@ export default function LoginPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen grid-bg flex items-center justify-center p-4" style={{ fontFamily: "var(--font-display)" }}>
-      {/* Background glow */}
-      <div style={{
-        position: "fixed", inset: 0, pointerEvents: "none",
-        background: "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,229,255,0.04) 0%, transparent 70%)"
-      }} />
+    <div style={{ minHeight: "100vh", display: "flex", fontFamily: "var(--font-body)" }}>
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        style={{ width: "100%", maxWidth: 420, position: "relative" }}
-      >
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            marginBottom: 16,
-            padding: "4px 12px",
-            border: "1px solid var(--border-bright)",
-            borderRadius: 4,
-            background: "var(--bg-elevated)"
-          }}>
-            <span className="status-dot dot-green pulse" />
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-secondary)", letterSpacing: "0.1em" }}>
-              SYSTEM ONLINE
-            </span>
+      {/* ── Left: Case File Cover ── */}
+      <div style={{
+        flex: "0 0 42%",
+        background: "var(--ink)",
+        color: "var(--paper)",
+        padding: "3rem",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Ledger rule texture */}
+        <div style={{
+          position: "absolute", inset: 0, opacity: 0.06,
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 27px, var(--paper) 27px, var(--paper) 28px)"
+        }} />
+
+        <div style={{ position: "relative" }}>
+          <div className="case-number" style={{ color: "var(--rule)", marginBottom: 40 }}>
+            CASE FILE NO. 000{Math.floor(Math.random() * 900 + 100)}
           </div>
 
-          <h1 style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 42,
-            fontWeight: 800,
-            letterSpacing: "-0.02em",
-            lineHeight: 1,
-            marginBottom: 8,
-            color: "var(--text-primary)",
+          <h1 className="font-display" style={{
+            fontSize: 56, fontWeight: 600, lineHeight: 1.05, letterSpacing: "-0.01em",
+            marginBottom: 20
           }}>
-            AGENT
-            <span className="glow-cyan" style={{ color: "var(--cyan)" }}>_OS</span>
+            Due<span style={{ fontStyle: "italic", color: "var(--rule)" }}>Sight</span>
           </h1>
 
-          <p style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            color: "var(--text-dim)",
-            letterSpacing: "0.15em",
-            textTransform: "uppercase"
-          }}>
-            Autonomous Task Automation Platform
+          <p style={{ fontSize: 15, color: "var(--rule)", lineHeight: 1.7, maxWidth: 380 }}>
+            Investment due diligence, compiled by a desk of five specialist AI analysts —
+            research, competitive mapping, risk assessment, and a signed-off memo in minutes.
           </p>
         </div>
 
-        {/* Card */}
-        <div style={{
-          background: "var(--bg-surface)",
-          border: "1px solid var(--border-bright)",
-          borderRadius: 8,
-          padding: 32,
-          position: "relative",
-          boxShadow: "0 0 40px rgba(0,229,255,0.06), 0 20px 60px rgba(0,0,0,0.5)"
-        }}>
-          {/* Corner accents */}
-          {["tl","tr","bl","br"].map(pos => (
-            <div key={pos} style={{
-              position: "absolute",
-              width: 12, height: 12,
-              ...(pos === "tl" ? { top: -1, left: -1, borderTop: "2px solid var(--cyan)", borderLeft: "2px solid var(--cyan)" } : {}),
-              ...(pos === "tr" ? { top: -1, right: -1, borderTop: "2px solid var(--cyan)", borderRight: "2px solid var(--cyan)" } : {}),
-              ...(pos === "bl" ? { bottom: -1, left: -1, borderBottom: "2px solid var(--cyan)", borderLeft: "2px solid var(--cyan)" } : {}),
-              ...(pos === "br" ? { bottom: -1, right: -1, borderBottom: "2px solid var(--cyan)", borderRight: "2px solid var(--cyan)" } : {}),
-            }} />
-          ))}
-
-          {/* Mode toggle */}
-          <div style={{
-            display: "grid", gridTemplateColumns: "1fr 1fr",
-            gap: 4, marginBottom: 28,
-            background: "var(--bg-base)",
-            border: "1px solid var(--border-default)",
-            borderRadius: 6, padding: 4
-          }}>
-            {(["login", "register"] as const).map(m => (
-              <button
-                key={m}
-                onClick={() => { setMode(m); setError(""); }}
-                style={{
-                  padding: "8px 0",
-                  borderRadius: 4,
-                  border: "none",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  background: mode === m ? "var(--cyan-glow)" : "transparent",
-                  color: mode === m ? "var(--cyan)" : "var(--text-dim)",
-                  boxShadow: mode === m ? "0 0 16px var(--cyan-glow-sm)" : "none",
-                }}
-              >
-                {m === "login" ? "Sign In" : "Register"}
-              </button>
+        <div style={{ position: "relative" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 30 }}>
+            {["Company Research", "Competitor Mapping", "Risk Assessment", "Investment Memo"].map((step, i) => (
+              <div key={step} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span className="font-mono" style={{ fontSize: 11, color: "var(--rule-dark)", width: 20 }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span style={{ fontSize: 13, color: "var(--rule)" }}>{step}</span>
+              </div>
             ))}
           </div>
-
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <label style={{
-                display: "block", marginBottom: 6,
-                fontFamily: "var(--font-mono)", fontSize: 10,
-                color: "var(--text-secondary)", letterSpacing: "0.12em",
-                textTransform: "uppercase"
-              }}>
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="operator@domain.com"
-                required
-                className="input-cyber"
-              />
-            </div>
-
-            <div>
-              <label style={{
-                display: "block", marginBottom: 6,
-                fontFamily: "var(--font-mono)", fontSize: 10,
-                color: "var(--text-secondary)", letterSpacing: "0.12em",
-                textTransform: "uppercase"
-              }}>
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="input-cyber"
-              />
-            </div>
-
-            <AnimatePresence>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  style={{
-                    background: "var(--red-glow)",
-                    border: "1px solid var(--red)",
-                    borderRadius: 4, padding: "8px 12px",
-                    fontFamily: "var(--font-mono)", fontSize: 12,
-                    color: "var(--red)"
-                  }}
-                >
-                  ⚠ {error}
-                </motion.div>
-              )}
-              {success && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  style={{
-                    background: "var(--green-glow)",
-                    border: "1px solid var(--green)",
-                    borderRadius: 4, padding: "8px 12px",
-                    fontFamily: "var(--font-mono)", fontSize: 12,
-                    color: "var(--green)"
-                  }}
-                >
-                  ✓ {success}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary"
-              style={{ marginTop: 4, opacity: loading ? 0.7 : 1 }}
-            >
-              {loading ? (
-                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                  <span className="status-dot dot-cyan pulse" />
-                  Processing...
-                </span>
-              ) : (
-                mode === "login" ? "Initialize Session" : "Create Account"
-              )}
-            </button>
-          </form>
+          <div className="case-number" style={{ color: "var(--rule-dark)" }}>
+            Prepared for internal review · Confidential
+          </div>
         </div>
+      </div>
 
-        {/* Footer */}
-        <p style={{
-          textAlign: "center", marginTop: 20,
-          fontFamily: "var(--font-mono)", fontSize: 10,
-          color: "var(--text-dim)", letterSpacing: "0.1em"
-        }}>
-          AGENT_OS v2.0 // MULTI-AGENT PLATFORM
-          <span className="blink" style={{ marginLeft: 4 }}>_</span>
-        </p>
-      </motion.div>
+      {/* ── Right: Sign-in form ── */}
+      <div style={{
+        flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "2rem", background: "var(--paper)",
+      }}>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          style={{ width: "100%", maxWidth: 380 }}
+        >
+          <div className="dossier-card" style={{ padding: "2.2rem 2.4rem" }}>
+
+            <div style={{ display: "flex", gap: 24, marginBottom: 28, borderBottom: "1px solid var(--rule)" }}>
+              {(["login", "register"] as const).map(m => (
+                <button
+                  key={m}
+                  onClick={() => { setMode(m); setError(""); }}
+                  style={{
+                    background: "none", border: "none", cursor: "pointer",
+                    padding: "0 0 12px 0",
+                    fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 500,
+                    letterSpacing: "0.08em", textTransform: "uppercase",
+                    color: mode === m ? "var(--ink)" : "var(--ink-faint)",
+                    borderBottom: mode === m ? "2px solid var(--stamp-red)" : "2px solid transparent",
+                    marginBottom: -1,
+                  }}
+                >
+                  {m === "login" ? "Sign In" : "New Analyst"}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <div>
+                <label className="case-number" style={{ display: "block", marginBottom: 8 }}>Email</label>
+                <input
+                  type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="analyst@firm.com" required className="input-ledger"
+                />
+              </div>
+              <div>
+                <label className="case-number" style={{ display: "block", marginBottom: 8 }}>Password</label>
+                <input
+                  type="password" value={password} onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••" required className="input-ledger"
+                />
+              </div>
+
+              <AnimatePresence>
+                {error && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    style={{
+                      fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--stamp-red)",
+                      background: "var(--stamp-red-glow)", padding: "8px 12px", borderLeft: "3px solid var(--stamp-red)"
+                    }}>
+                    ⚠ {error}
+                  </motion.div>
+                )}
+                {success && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    style={{
+                      fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--verified)",
+                      background: "var(--verified-glow)", padding: "8px 12px", borderLeft: "3px solid var(--verified)"
+                    }}>
+                    ✓ {success}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <button type="submit" disabled={loading} className="btn-ink" style={{ marginTop: 6 }}>
+                {loading ? "Processing…" : mode === "login" ? "Open Case File" : "Create Analyst Account"}
+              </button>
+            </form>
+          </div>
+
+          <p className="case-number" style={{ textAlign: "center", marginTop: 20 }}>
+            DueSight · AI Due Diligence Desk
+          </p>
+        </motion.div>
+      </div>
     </div>
   );
 }
