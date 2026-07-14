@@ -21,16 +21,14 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess("");
+    setLoading(true); setError(""); setSuccess("");
     try {
       if (mode === "register") {
         await register(email, password);
-        setSuccess("Case file created. Signing you in...");
+        setSuccess("Account created. Signing you in...");
         const data = await login(email, password);
         Auth.save(data.access_token, data.email, data.user_id);
-        setTimeout(() => router.push("/dashboard"), 700);
+        setTimeout(() => router.push("/dashboard"), 600);
       } else {
         const data = await login(email, password);
         Auth.save(data.access_token, data.email, data.user_id);
@@ -38,150 +36,91 @@ export default function LoginPage() {
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
   if (!mounted) return null;
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", fontFamily: "var(--font-body)" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem", position: "relative", overflow: "hidden" }}>
 
-      {/* ── Left: Case File Cover ── */}
-      <div style={{
-        flex: "0 0 42%",
-        background: "var(--ink)",
-        color: "var(--paper)",
-        padding: "3rem",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        {/* Ledger rule texture */}
-        <div style={{
-          position: "absolute", inset: 0, opacity: 0.06,
-          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 27px, var(--paper) 27px, var(--paper) 28px)"
-        }} />
+      {/* Ambient glow orbs */}
+      <div style={{ position: "fixed", top: "-10%", left: "10%", width: 400, height: 400, borderRadius: "50%", background: "var(--accent)", opacity: 0.12, filter: "blur(120px)", pointerEvents: "none" }} />
+      <div style={{ position: "fixed", bottom: "-10%", right: "10%", width: 400, height: 400, borderRadius: "50%", background: "var(--success)", opacity: 0.08, filter: "blur(120px)", pointerEvents: "none" }} />
 
-        <div style={{ position: "relative" }}>
-          <div className="case-number" style={{ color: "var(--rule)", marginBottom: 40 }}>
-            CASE FILE NO. 000{Math.floor(Math.random() * 900 + 100)}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+        style={{ width: "100%", maxWidth: 420, position: "relative" }}>
+
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20,
+            padding: "6px 14px", borderRadius: 20, background: "var(--surface)", border: "1px solid var(--border-strong)"
+          }}>
+            <span className="status-dot dot-accent pulse" />
+            <span className="font-mono" style={{ fontSize: 11, color: "var(--text-secondary)", letterSpacing: "0.06em" }}>
+              AI DUE DILIGENCE DESK
+            </span>
           </div>
 
-          <h1 className="font-display" style={{
-            fontSize: 56, fontWeight: 600, lineHeight: 1.05, letterSpacing: "-0.01em",
-            marginBottom: 20
-          }}>
-            Due<span style={{ fontStyle: "italic", color: "var(--rule)" }}>Sight</span>
+          <h1 className="font-display" style={{ fontSize: 40, fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text-primary)", marginBottom: 10 }}>
+            Due<span className="shimmer">Sight</span>
           </h1>
-
-          <p style={{ fontSize: 15, color: "var(--rule)", lineHeight: 1.7, maxWidth: 380 }}>
-            Investment due diligence, compiled by a desk of five specialist AI analysts —
-            research, competitive mapping, risk assessment, and a signed-off memo in minutes.
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, maxWidth: 320, margin: "0 auto" }}>
+            Five AI analysts research, compare, and score any company —
+            you sign off on the memo.
           </p>
         </div>
 
-        <div style={{ position: "relative" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 30 }}>
-            {["Company Research", "Competitor Mapping", "Risk Assessment", "Investment Memo"].map((step, i) => (
-              <div key={step} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span className="font-mono" style={{ fontSize: 11, color: "var(--rule-dark)", width: 20 }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span style={{ fontSize: 13, color: "var(--rule)" }}>{step}</span>
-              </div>
+        <div className="card-high fade-in" style={{ padding: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, marginBottom: 28, background: "var(--bg)", borderRadius: 10, padding: 4 }}>
+            {(["login", "register"] as const).map(m => (
+              <button key={m} onClick={() => { setMode(m); setError(""); }} style={{
+                padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                fontSize: 13, fontWeight: 600, transition: "all 0.2s",
+                background: mode === m ? "var(--accent)" : "transparent",
+                color: mode === m ? "#fff" : "var(--text-muted)",
+                boxShadow: mode === m ? "0 4px 14px rgba(109,94,245,0.3)" : "none",
+              }}>
+                {m === "login" ? "Sign In" : "Register"}
+              </button>
             ))}
           </div>
-          <div className="case-number" style={{ color: "var(--rule-dark)" }}>
-            Prepared for internal review · Confidential
-          </div>
-        </div>
-      </div>
 
-      {/* ── Right: Sign-in form ── */}
-      <div style={{
-        flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "2rem", background: "var(--paper)",
-      }}>
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          style={{ width: "100%", maxWidth: 380 }}
-        >
-          <div className="dossier-card" style={{ padding: "2.2rem 2.4rem" }}>
-
-            <div style={{ display: "flex", gap: 24, marginBottom: 28, borderBottom: "1px solid var(--rule)" }}>
-              {(["login", "register"] as const).map(m => (
-                <button
-                  key={m}
-                  onClick={() => { setMode(m); setError(""); }}
-                  style={{
-                    background: "none", border: "none", cursor: "pointer",
-                    padding: "0 0 12px 0",
-                    fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 500,
-                    letterSpacing: "0.08em", textTransform: "uppercase",
-                    color: mode === m ? "var(--ink)" : "var(--ink-faint)",
-                    borderBottom: mode === m ? "2px solid var(--stamp-red)" : "2px solid transparent",
-                    marginBottom: -1,
-                  }}
-                >
-                  {m === "login" ? "Sign In" : "New Analyst"}
-                </button>
-              ))}
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div>
+              <label style={{ display: "block", marginBottom: 7, fontSize: 12, fontWeight: 500, color: "var(--text-secondary)" }}>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@firm.com" required className="input-field" />
+            </div>
+            <div>
+              <label style={{ display: "block", marginBottom: 7, fontSize: 12, fontWeight: 500, color: "var(--text-secondary)" }}>Password</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required className="input-field" />
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              <div>
-                <label className="case-number" style={{ display: "block", marginBottom: 8 }}>Email</label>
-                <input
-                  type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="analyst@firm.com" required className="input-ledger"
-                />
-              </div>
-              <div>
-                <label className="case-number" style={{ display: "block", marginBottom: 8 }}>Password</label>
-                <input
-                  type="password" value={password} onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••" required className="input-ledger"
-                />
-              </div>
+            <AnimatePresence>
+              {error && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                  className="badge badge-danger" style={{ width: "100%", justifyContent: "flex-start", padding: "10px 14px" }}>
+                  {error}
+                </motion.div>
+              )}
+              {success && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
+                  className="badge badge-success" style={{ width: "100%", justifyContent: "flex-start", padding: "10px 14px" }}>
+                  {success}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-              <AnimatePresence>
-                {error && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    style={{
-                      fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--stamp-red)",
-                      background: "var(--stamp-red-glow)", padding: "8px 12px", borderLeft: "3px solid var(--stamp-red)"
-                    }}>
-                    ⚠ {error}
-                  </motion.div>
-                )}
-                {success && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    style={{
-                      fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--verified)",
-                      background: "var(--verified-glow)", padding: "8px 12px", borderLeft: "3px solid var(--verified)"
-                    }}>
-                    ✓ {success}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: 4, width: "100%" }}>
+              {loading ? "Processing…" : mode === "login" ? "Sign In" : "Create Account"}
+            </button>
+          </form>
+        </div>
 
-              <button type="submit" disabled={loading} className="btn-ink" style={{ marginTop: 6 }}>
-                {loading ? "Processing…" : mode === "login" ? "Open Case File" : "Create Analyst Account"}
-              </button>
-            </form>
-          </div>
-
-          <p className="case-number" style={{ textAlign: "center", marginTop: 20 }}>
-            DueSight · AI Due Diligence Desk
-          </p>
-        </motion.div>
-      </div>
+        <p className="font-mono" style={{ textAlign: "center", marginTop: 20, fontSize: 11, color: "var(--text-muted)", letterSpacing: "0.05em" }}>
+          DueSight — Powered by a 5-agent research council
+        </p>
+      </motion.div>
     </div>
   );
 }
