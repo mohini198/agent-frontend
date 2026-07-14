@@ -11,7 +11,7 @@
 
 ## 🚀 Live Demo
 
-[agent-os.vercel.app](https://agent-os.vercel.app) *(update after deploy)*
+**Frontend**:(https://agent-frontend-henna-pi.vercel.app/)
 
 > **Backend repo:** [github.com/mohini198/agent-platform](https://github.com/mohini198/agent-platform)
 
